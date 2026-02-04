@@ -29,7 +29,7 @@ export function attachWebSocketServer(server) {
                     return
                 }
             } catch (error) {
-                console.error('WS connection error',e);
+                console.error('WS connection error', error);
                 socket.close(1011,'server security error')
                 return
             }
