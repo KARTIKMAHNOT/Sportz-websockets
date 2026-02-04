@@ -1,1 +1,2 @@
 # Sportz-websockets
+ajkey_01kgm36e4sftjrvg1c8vdz43q4
