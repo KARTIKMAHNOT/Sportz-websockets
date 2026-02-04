@@ -83,9 +83,20 @@ export function attachWebSocketServer(server) {
     const wss = new WebSocketServer({ noServer: true, path: '/ws', maxPayload: 1024 * 1024 });
 
     server.on('upgrade', async (req, socket, head) => {
-        const { pathname } = new URL(req.url, `http://${req.headers.host}`);
+        let pathname;
+        try {
+            const url = new URL(req.url, `http://${req.headers.host}`);
+            pathname = url.pathname;
+        } catch (error) {
+            console.error('URL parsing error in upgrade handler', error);
+            socket.write('HTTP/1.1 400 Bad Request\r\n\r\n');
+            socket.destroy();
+            return;
+        }
 
         if (pathname !== '/ws') {
+            socket.write('HTTP/1.1 404 Not Found\r\n\r\n');
+            socket.destroy();
             return;
         }
 
@@ -102,8 +113,8 @@ export function attachWebSocketServer(server) {
                     socket.destroy();
                     return;
                 }
-            } catch (e) {
-                console.error('WS upgrade protection error', e);
+            } catch (error) {
+                console.error('WS upgrade protection error', error);
                 socket.write('HTTP/1.1 500 Internal Server Error\r\n\r\n');
                 socket.destroy();
                 return;
